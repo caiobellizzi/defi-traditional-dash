@@ -52,6 +52,14 @@ export interface WalletDto {
   updatedAt: string;
 }
 
+export interface WalletDtoPagedResult {
+  items: WalletDto[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 export interface AddWalletCommand {
   walletAddress: string;
   label: string;

@@ -7,6 +7,17 @@ import type { CreateAllocationCommand } from '../types/api';
  */
 
 /**
+ * Fetch all allocations
+ */
+export const useAllocations = () => {
+  return useQuery({
+    queryKey: ['allocations'],
+    queryFn: () => allocationsApi.getAll(),
+    staleTime: 10000,
+  });
+};
+
+/**
  * Fetch allocations for a specific client
  */
 export const useClientAllocations = (clientId: string) => {

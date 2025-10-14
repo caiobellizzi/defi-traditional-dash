@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ClientsPage from './pages/ClientsPage';
+import WalletsPage from './pages/WalletsPage';
+import AllocationsPage from './pages/AllocationsPage';
 
 /**
  * Configure React Query client
@@ -29,9 +31,13 @@ function App() {
           {/* Clients routes */}
           <Route path="/clients" element={<ClientsPage />} />
 
+          {/* Wallets routes */}
+          <Route path="/wallets" element={<WalletsPage />} />
+
+          {/* Allocations routes */}
+          <Route path="/allocations" element={<AllocationsPage />} />
+
           {/* Future routes */}
-          {/* <Route path="/wallets" element={<WalletsPage />} /> */}
-          {/* <Route path="/allocations" element={<AllocationsPage />} /> */}
           {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
 
           {/* 404 fallback */}

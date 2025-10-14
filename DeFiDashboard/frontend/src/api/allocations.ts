@@ -6,6 +6,14 @@ import type { AllocationDto, CreateAllocationCommand } from '../types/api';
  */
 export const allocationsApi = {
   /**
+   * Get all allocations
+   */
+  getAll: async (): Promise<AllocationDto[]> => {
+    const response = await apiClient.get<AllocationDto[]>('/api/allocations');
+    return response.data;
+  },
+
+  /**
    * Get allocations for a specific client
    */
   getByClient: async (clientId: string): Promise<AllocationDto[]> => {
