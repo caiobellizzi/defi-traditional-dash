@@ -3,6 +3,7 @@ import { useCreateAllocation } from '../hooks/useAllocations';
 import AllocationForm from '../components/allocations/AllocationForm';
 import Button from '../components/ui/Button';
 import Dialog from '../components/ui/Dialog';
+import { PageLayout } from '../components/layout/PageLayout';
 import type { CreateAllocationCommand } from '../types/api';
 
 const AllocationsPage = () => {
@@ -24,28 +25,24 @@ const AllocationsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageLayout>
       {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Client Allocations
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Manage how clients are allocated to custody assets
-              </p>
-            </div>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              Create Allocation
-            </Button>
-          </div>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Client Allocations
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Manage how clients are allocated to custody assets
+          </p>
         </div>
+        <Button onClick={() => setIsCreateDialogOpen(true)}>
+          Create Allocation
+        </Button>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="space-y-6">
         {/* Info Card */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
           <div className="flex">
@@ -212,7 +209,7 @@ const AllocationsPage = () => {
           isLoading={createMutation.isPending}
         />
       </Dialog>
-    </div>
+    </PageLayout>
   );
 };
 

@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import DashboardPage from './pages/DashboardPage';
 import ClientsPage from './pages/ClientsPage';
 import WalletsPage from './pages/WalletsPage';
 import AllocationsPage from './pages/AllocationsPage';
@@ -25,8 +26,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          {/* Redirect root to clients page */}
-          <Route path="/" element={<Navigate to="/clients" replace />} />
+          {/* Redirect root to dashboard */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+          {/* Dashboard */}
+          <Route path="/dashboard" element={<DashboardPage />} />
 
           {/* Clients routes */}
           <Route path="/clients" element={<ClientsPage />} />
@@ -37,11 +41,8 @@ function App() {
           {/* Allocations routes */}
           <Route path="/allocations" element={<AllocationsPage />} />
 
-          {/* Future routes */}
-          {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
-
           {/* 404 fallback */}
-          <Route path="*" element={<Navigate to="/clients" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

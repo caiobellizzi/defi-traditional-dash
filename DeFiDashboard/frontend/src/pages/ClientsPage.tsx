@@ -9,6 +9,7 @@ import ClientForm from '../components/clients/ClientForm';
 import Button from '../components/ui/Button';
 import Dialog from '../components/ui/Dialog';
 import Table from '../components/ui/Table';
+import { PageLayout } from '../components/layout/PageLayout';
 import type { ClientDto, CreateClientCommand } from '../types/api';
 
 const ClientsPage = () => {
@@ -132,26 +133,22 @@ const ClientsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageLayout>
       {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Clients</h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Manage your client portfolio and allocations
-              </p>
-            </div>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              Add Client
-            </Button>
-          </div>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Clients</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Manage your client portfolio and allocations
+          </p>
         </div>
+        <Button onClick={() => setIsCreateDialogOpen(true)}>
+          Add Client
+        </Button>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="space-y-6">
         {/* Error State */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
@@ -257,7 +254,7 @@ const ClientsPage = () => {
           />
         )}
       </Dialog>
-    </div>
+    </PageLayout>
   );
 };
 
