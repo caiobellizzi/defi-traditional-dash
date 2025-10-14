@@ -8,8 +8,5 @@ export default defineConfig({
     port: 5173,
     host: true,        // Required for Aspire
     strictPort: true,
-    watch: {
-      usePolling: true, // Better compatibility
-    },
   },
 })
