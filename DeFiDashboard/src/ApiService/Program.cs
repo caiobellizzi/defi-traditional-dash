@@ -10,16 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Add Database with Aspire integration (automatic health checks + telemetry)
-builder.AddNpgsqlDbContext<ApplicationDbContext>("defi-db",
-    configureDbContextOptions: dbOptions =>
-    {
-        // Note: Migration assembly is configured on NpgsqlOptions below
-    },
-    configureSettings: settings =>
-    {
-        // Connection pooling and retry settings
-        settings.MaxRetryCount = 3;
-    });
+builder.AddNpgsqlDbContext<ApplicationDbContext>("defi-db");
 
 // Add services to the container
 builder.Services.AddCarter();
