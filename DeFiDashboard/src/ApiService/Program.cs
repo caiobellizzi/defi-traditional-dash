@@ -9,16 +9,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Aspire service defaults (observability, health checks)
 builder.AddServiceDefaults();
 
-// Add Database
-var connectionString = builder.Configuration.GetConnectionString("Supabase")
-    ?? throw new InvalidOperationException("Connection string 'Supabase' not found.");
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString, npgsqlOptions =>
+// Add Database with Aspire integration (automatic health checks + telemetry)
+builder.AddNpgsqlDbContext<ApplicationDbContext>("defi-db",
+    configureDbContextOptions: dbOptions =>
     {
-        npgsqlOptions.MigrationsAssembly(typeof(Program).Assembly.FullName);
-        npgsqlOptions.EnableRetryOnFailure(maxRetryCount: 3);
-    }));
+        // Note: Migration assembly is configured on NpgsqlOptions below
+    },
+    configureSettings: settings =>
+    {
+        // Connection pooling and retry settings
+        settings.MaxRetryCount = 3;
+    });
 
 // Add services to the container
 builder.Services.AddCarter();
@@ -34,6 +35,18 @@ builder.Services.AddMediatR(cfg => {
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -44,6 +57,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Enable CORS
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 

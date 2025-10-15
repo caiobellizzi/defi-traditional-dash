@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
 import DashboardPage from './pages/DashboardPage';
 import ClientsPage from './pages/ClientsPage';
 import WalletsPage from './pages/WalletsPage';
@@ -23,29 +24,31 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          {/* Redirect root to dashboard */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            {/* Redirect root to dashboard */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-          {/* Dashboard */}
-          <Route path="/dashboard" element={<DashboardPage />} />
+            {/* Dashboard */}
+            <Route path="/dashboard" element={<DashboardPage />} />
 
-          {/* Clients routes */}
-          <Route path="/clients" element={<ClientsPage />} />
+            {/* Clients routes */}
+            <Route path="/clients" element={<ClientsPage />} />
 
-          {/* Wallets routes */}
-          <Route path="/wallets" element={<WalletsPage />} />
+            {/* Wallets routes */}
+            <Route path="/wallets" element={<WalletsPage />} />
 
-          {/* Allocations routes */}
-          <Route path="/allocations" element={<AllocationsPage />} />
+            {/* Allocations routes */}
+            <Route path="/allocations" element={<AllocationsPage />} />
 
-          {/* 404 fallback */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
+            {/* 404 fallback */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

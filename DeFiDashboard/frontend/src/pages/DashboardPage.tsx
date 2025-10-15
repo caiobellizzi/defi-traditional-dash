@@ -112,8 +112,8 @@ export default function DashboardPage() {
       <div className="space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             Custody asset management overview
           </p>
         </div>
@@ -212,13 +212,13 @@ export default function DashboardPage() {
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Client Status Distribution */}
-          <div className="bg-white rounded-lg border p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-card dark:shadow-card-dark transition-colors duration-200">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Client Status Distribution
             </h2>
             {isLoading ? (
               <div className="h-80 flex items-center justify-center">
-                <div className="animate-pulse text-gray-400">Loading chart...</div>
+                <div className="animate-pulse text-gray-400 dark:text-gray-500">Loading chart...</div>
               </div>
             ) : clientStatusData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
@@ -239,37 +239,37 @@ export default function DashboardPage() {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--tooltip-bg)', border: '1px solid var(--tooltip-border)' }} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-80 flex items-center justify-center text-gray-400">
+              <div className="h-80 flex items-center justify-center text-gray-400 dark:text-gray-500">
                 No client data available
               </div>
             )}
           </div>
 
           {/* Wallets by Network */}
-          <div className="bg-white rounded-lg border p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-card dark:shadow-card-dark transition-colors duration-200">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Wallets by Network
             </h2>
             {isLoading ? (
               <div className="h-80 flex items-center justify-center">
-                <div className="animate-pulse text-gray-400">Loading chart...</div>
+                <div className="animate-pulse text-gray-400 dark:text-gray-500">Loading chart...</div>
               </div>
             ) : networkData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={networkData}>
-                  <XAxis dataKey="network" />
-                  <YAxis />
-                  <Tooltip />
+                  <XAxis dataKey="network" stroke="currentColor" className="text-gray-600 dark:text-gray-400" />
+                  <YAxis stroke="currentColor" className="text-gray-600 dark:text-gray-400" />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--tooltip-bg)', border: '1px solid var(--tooltip-border)' }} />
                   <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-80 flex items-center justify-center text-gray-400">
+              <div className="h-80 flex items-center justify-center text-gray-400 dark:text-gray-500">
                 No wallet data available
               </div>
             )}
@@ -277,90 +277,90 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-lg border overflow-hidden">
-          <div className="p-6 border-b">
-            <h2 className="text-lg font-semibold text-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-card dark:shadow-card-dark transition-colors duration-200">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Recent Activity
             </h2>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x">
+          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 dark:divide-gray-700">
             {/* Recent Clients */}
             <div className="p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-4">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wide">
                 Recently Added Clients
               </h3>
               {isLoading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="animate-pulse">
-                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
                     </div>
                   ))}
                 </div>
               ) : recentClients.length > 0 ? (
                 <div className="space-y-3">
                   {recentClients.map((client) => (
-                    <div key={client.id} className="flex items-center justify-between">
+                    <div key={client.id} className="flex items-center justify-between group/item">
                       <div className="min-w-0 flex-1">
                         <Link
                           to="/clients"
-                          className="text-sm font-medium text-gray-900 hover:text-blue-600 truncate block"
+                          className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 truncate block transition-colors"
                         >
                           {client.name}
                         </Link>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {client.email}
                         </p>
                       </div>
-                      <span className="text-xs text-gray-400 ml-2">
+                      <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
                         {formatDate(client.createdAt)}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-400">No clients yet</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">No clients yet</p>
               )}
             </div>
 
             {/* Recent Wallets */}
             <div className="p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-4">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wide">
                 Recently Added Wallets
               </h3>
               {isLoading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="animate-pulse">
-                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
                     </div>
                   ))}
                 </div>
               ) : recentWallets.length > 0 ? (
                 <div className="space-y-3">
                   {recentWallets.map((wallet: any) => (
-                    <div key={wallet.id} className="flex items-center justify-between">
+                    <div key={wallet.id} className="flex items-center justify-between group/item">
                       <div className="min-w-0 flex-1">
                         <Link
                           to="/wallets"
-                          className="text-sm font-medium text-gray-900 hover:text-blue-600 truncate block"
+                          className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 truncate block transition-colors"
                         >
                           {wallet.label}
                         </Link>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {wallet.supportedChains.join(', ')}
                         </p>
                       </div>
-                      <span className="text-xs text-gray-400 ml-2">
+                      <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
                         {formatDate(wallet.createdAt)}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-400">No wallets yet</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">No wallets yet</p>
               )}
             </div>
           </div>
@@ -368,7 +368,7 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
