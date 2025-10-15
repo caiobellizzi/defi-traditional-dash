@@ -1,12 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useClients } from '../hooks/useClients';
 import { useWallets } from '../hooks/useWallets';
 import { useAllocations } from '../hooks/useAllocations';
+import { portfolioApi } from '../api/portfolio';
 import { StatCard } from '../components/dashboard/StatCard';
 import { QuickActionCard } from '../components/dashboard/QuickActionCard';
 import { PageLayout } from '../components/layout/PageLayout';
-import { formatDate } from '../lib/formatters';
+import { formatDate, formatCurrency } from '../lib/formatters';
+import type { ClientPortfolioDto } from '../types/portfolio';
 import {
   PieChart,
   Pie,
@@ -39,6 +41,36 @@ export default function DashboardPage() {
   const { data: clientsData, isLoading: clientsLoading } = useClients();
   const { data: walletsData, isLoading: walletsLoading } = useWallets();
   const { data: allocationsData, isLoading: allocationsLoading } = useAllocations();
+  const [totalAUM, setTotalAUM] = useState<number>(0);
+  const [aumLoading, setAumLoading] = useState(false);
+
+  // Calculate total AUM by fetching all client portfolios
+  useEffect(() => {
+    const calculateAUM = async () => {
+      if (!clientsData?.items) return;
+
+      setAumLoading(true);
+      try {
+        const portfolios = await Promise.all(
+          clientsData.items.map((client) =>
+            portfolioApi.getClientPortfolio(client.id).catch(() => null)
+          )
+        );
+
+        const total = portfolios
+          .filter((p): p is ClientPortfolioDto => p !== null)
+          .reduce((sum, p) => sum + p.totalValueUsd, 0);
+
+        setTotalAUM(total);
+      } catch (error) {
+        console.error('Failed to calculate AUM:', error);
+      } finally {
+        setAumLoading(false);
+      }
+    };
+
+    calculateAUM();
+  }, [clientsData]);
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -120,6 +152,28 @@ export default function DashboardPage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard
+            title="Total AUM"
+            value={formatCurrency(totalAUM)}
+            subtitle="Assets Under Management"
+            isLoading={aumLoading}
+            icon={
+              <svg
+                className="w-12 h-12"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            }
+          />
+
           <StatCard
             title="Total Clients"
             value={stats.totalClients}
