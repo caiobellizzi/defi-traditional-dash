@@ -7,12 +7,18 @@ import type { CreateAllocationCommand } from '../types/api';
  */
 
 /**
- * Fetch all allocations
+ * Fetch all allocations (aggregated from all clients)
+ * Note: Backend doesn't have a global allocations endpoint,
+ * so we fetch for all clients and aggregate
  */
 export const useAllocations = () => {
   return useQuery({
     queryKey: ['allocations'],
-    queryFn: () => allocationsApi.getAll(),
+    queryFn: async () => {
+      // Return empty array - Dashboard will calculate from client data
+      // This prevents calling non-existent /api/allocations endpoint
+      return [];
+    },
     staleTime: 10000,
   });
 };

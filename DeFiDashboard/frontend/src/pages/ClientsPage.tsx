@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import {
   useClients,
   useCreateClient,
@@ -30,10 +31,10 @@ const ClientsPage = () => {
     try {
       await createMutation.mutateAsync(formData);
       setIsCreateDialogOpen(false);
-      alert('Client created successfully!');
+      toast.success('Client created successfully!');
     } catch (error) {
       console.error('Failed to create client:', error);
-      alert('Failed to create client. Please try again.');
+      toast.error('Failed to create client. Please try again.');
     }
   };
 
@@ -47,10 +48,10 @@ const ClientsPage = () => {
       });
       setIsEditDialogOpen(false);
       setSelectedClient(null);
-      alert('Client updated successfully!');
+      toast.success('Client updated successfully!');
     } catch (error) {
       console.error('Failed to update client:', error);
-      alert('Failed to update client. Please try again.');
+      toast.error('Failed to update client. Please try again.');
     }
   };
 
@@ -61,10 +62,10 @@ const ClientsPage = () => {
 
     try {
       await deleteMutation.mutateAsync(client.id);
-      alert('Client deleted successfully!');
+      toast.success('Client deleted successfully!');
     } catch (error) {
       console.error('Failed to delete client:', error);
-      alert('Failed to delete client. Please try again.');
+      toast.error('Failed to delete client. Please try again.');
     }
   };
 
@@ -137,8 +138,8 @@ const ClientsPage = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Clients</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Clients</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Manage your client portfolio and allocations
           </p>
         </div>
@@ -151,8 +152,8 @@ const ClientsPage = () => {
       <div className="space-y-6">
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-800">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+            <p className="text-red-800 dark:text-red-300">
               Failed to load clients. Please try again later.
             </p>
           </div>
@@ -160,23 +161,23 @@ const ClientsPage = () => {
 
         {/* Stats */}
         {data && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-card dark:shadow-card-dark p-6 mb-6 border border-gray-200 dark:border-gray-700 transition-colors">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-gray-500">Total Clients</p>
-                <p className="text-2xl font-semibold text-gray-900">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Total Clients</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                   {data.totalCount}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Current Page</p>
-                <p className="text-2xl font-semibold text-gray-900">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Current Page</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                   {data.pageNumber} of {data.totalPages}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Showing</p>
-                <p className="text-2xl font-semibold text-gray-900">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Showing</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                   {data.items.length} clients
                 </p>
               </div>
@@ -185,7 +186,7 @@ const ClientsPage = () => {
         )}
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-card dark:shadow-card-dark overflow-hidden border border-gray-200 dark:border-gray-700 transition-colors">
           <Table
             data={data?.items || []}
             columns={columns}
@@ -195,7 +196,7 @@ const ClientsPage = () => {
 
           {/* Pagination */}
           {data && data.totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <Button
                 variant="ghost"
                 onClick={() => setPageNumber((p) => Math.max(1, p - 1))}
@@ -203,7 +204,7 @@ const ClientsPage = () => {
               >
                 Previous
               </Button>
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-gray-700 dark:text-gray-300">
                 Page {pageNumber} of {data.totalPages}
               </span>
               <Button
