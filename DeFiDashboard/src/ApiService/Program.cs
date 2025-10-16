@@ -1,5 +1,6 @@
 using ApiService.Common.Behaviors;
 using ApiService.Common.Database;
+using ApiService.Common.Middleware;
 using Carter;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -52,9 +53,14 @@ if (app.Environment.IsDevelopment())
 // Enable CORS
 app.UseCors("AllowFrontend");
 
+app.UseMiddleware<ValidationExceptionMiddleware>();
+
 app.UseHttpsRedirection();
 
 // Map Carter endpoints
 app.MapCarter();
 
 app.Run();
+
+// Make Program class accessible to integration tests
+public partial class Program { }
