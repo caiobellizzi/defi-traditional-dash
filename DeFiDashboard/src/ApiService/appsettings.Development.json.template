@@ -1,0 +1,31 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "Microsoft.AspNetCore": "Information",
+      "Microsoft.EntityFrameworkCore.Database.Command": "Information",
+      "Hangfire": "Information"
+    }
+  },
+  "ConnectionStrings": {
+    "Supabase": "Host=localhost;Database=defi_dashboard;Username=postgres;Password=postgres"
+  },
+  "ExternalProviders": {
+    "Moralis": {
+      "ApiKey": "YOUR_MORALIS_API_KEY_HERE",
+      "BaseUrl": "https://deep-index.moralis.io/api/v2.2"
+    },
+    "Pluggy": {
+      "ClientId": "YOUR_PLUGGY_CLIENT_ID_HERE",
+      "ClientSecret": "YOUR_PLUGGY_CLIENT_SECRET_HERE",
+      "BaseUrl": "https://api.pluggy.ai"
+    }
+  },
+  "BackgroundJobs": {
+    "MoralisSyncIntervalMinutes": 5,
+    "PluggySyncIntervalMinutes": 10,
+    "PortfolioCalculationIntervalMinutes": 15,
+    "RebalancingCheckIntervalMinutes": 60
+  },
+  "AllowedHosts": "*"
+}
