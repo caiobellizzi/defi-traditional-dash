@@ -1,0 +1,1617 @@
+openapi: 3.0.3
+info:
+  title: DeFi-Traditional Finance Dashboard API
+  description: |
+    Comprehensive wealth management API for fund advisors managing custody assets
+    across DeFi (crypto wallets) and traditional finance (bank accounts, investments).
+
+    **Architecture**: Vertical Slice Architecture with CQRS pattern
+    **Authentication**: Bearer JWT tokens
+    **Rate Limiting**: 100 req/min per client, 1000 req/min global
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: api@defidashboard.com
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.defidashboard.com/v1
+    description: Production
+  - url: https://staging-api.defidashboard.com/v1
+    description: Staging
+  - url: http://localhost:5000/api
+    description: Local Development
+
+tags:
+  - name: Clients
+    description: Client management operations
+  - name: Wallets
+    description: Custody wallet operations (DeFi)
+  - name: Accounts
+    description: Traditional account operations (OpenFinance)
+  - name: Allocations
+    description: Client asset allocation management
+  - name: Transactions
+    description: Transaction history and management
+  - name: Portfolio
+    description: Portfolio calculations and analytics
+  - name: Analytics
+    description: Performance analytics and metrics
+  - name: Alerts
+    description: Rebalancing and system alerts
+  - name: Export
+    description: Report export operations
+  - name: System
+    description: System configuration and health
+
+paths:
+  # ========================================
+  # CLIENTS
+  # ========================================
+  /clients:
+    get:
+      tags: [Clients]
+      summary: List clients
+      description: Get paginated list of clients with optional filtering
+      operationId: getClients
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [Active, Inactive, Archived]
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [name, email, createdAt]
+            default: name
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+        - name: search
+          in: query
+          description: Search by name or email
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PagedResult'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ClientDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags: [Clients]
+      summary: Create client
+      operationId: createClient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClientCommand'
+      responses:
+        '201':
+          description: Client created
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URI of created client
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /clients/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ClientId'
+
+    get:
+      tags: [Clients]
+      summary: Get client by ID
+      operationId: getClientById
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDto'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Clients]
+      summary: Update client
+      operationId: updateClient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClientCommand'
+      responses:
+        '200':
+          description: Client updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Clients]
+      summary: Delete client
+      description: Soft-delete client (sets status to Archived)
+      operationId: deleteClient
+      responses:
+        '204':
+          description: Client deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clients/{id}/portfolio:
+    parameters:
+      - $ref: '#/components/parameters/ClientId'
+    get:
+      tags: [Clients, Portfolio]
+      summary: Get client portfolio
+      operationId: getClientPortfolio
+      parameters:
+        - name: includeHistory
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientPortfolioDto'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clients/{id}/allocations:
+    parameters:
+      - $ref: '#/components/parameters/ClientId'
+    get:
+      tags: [Clients, Allocations]
+      summary: Get client allocations
+      operationId: getClientAllocations
+      parameters:
+        - name: activeOnly
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AllocationDto'
+
+  # ========================================
+  # WALLETS
+  # ========================================
+  /wallets:
+    get:
+      tags: [Wallets]
+      summary: List wallets
+      operationId: getWallets
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [Active, Inactive]
+        - name: chain
+          in: query
+          schema:
+            type: string
+            example: ethereum
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PagedResult'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/WalletDto'
+
+    post:
+      tags: [Wallets]
+      summary: Add wallet
+      operationId: addWallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddWalletCommand'
+      responses:
+        '201':
+          description: Wallet added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+
+  /wallets/{id}/balances:
+    parameters:
+      - $ref: '#/components/parameters/WalletId'
+    get:
+      tags: [Wallets]
+      summary: Get wallet balances
+      operationId: getWalletBalances
+      parameters:
+        - name: chain
+          in: query
+          schema:
+            type: string
+        - name: minBalance
+          in: query
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletBalanceDto'
+
+  /wallets/{id}/sync:
+    parameters:
+      - $ref: '#/components/parameters/WalletId'
+    post:
+      tags: [Wallets]
+      summary: Sync wallet
+      description: Trigger manual sync with blockchain provider
+      operationId: syncWallet
+      responses:
+        '202':
+          description: Sync initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                  status:
+                    type: string
+                    enum: [queued, processing]
+
+  # ========================================
+  # ACCOUNTS
+  # ========================================
+  /accounts/connect-token:
+    post:
+      tags: [Accounts]
+      summary: Create Pluggy connect token
+      description: Generate OAuth token for Pluggy widget integration
+      operationId: createConnectToken
+      responses:
+        '200':
+          description: Connect token created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  connectUrl:
+                    type: string
+                    format: uri
+                  expiresIn:
+                    type: integer
+                    description: Token expiration in seconds
+
+  /accounts/callback:
+    post:
+      tags: [Accounts]
+      summary: Handle Pluggy callback
+      description: Process OAuth callback from Pluggy after account connection
+      operationId: handlePluggyCallback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemId:
+                  type: string
+                executionStatus:
+                  type: string
+      responses:
+        '200':
+          description: Callback processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountIds:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+
+  /accounts:
+    get:
+      tags: [Accounts]
+      summary: List accounts
+      operationId: getAccounts
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [Active, Inactive, Error]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PagedResult'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AccountDto'
+
+  # ========================================
+  # ALLOCATIONS
+  # ========================================
+  /allocations:
+    get:
+      tags: [Allocations]
+      summary: List allocations
+      operationId: getAllocations
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: clientId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: assetType
+          in: query
+          schema:
+            type: string
+            enum: [Wallet, Account]
+        - name: activeOnly
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PagedResult'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AllocationDto'
+
+    post:
+      tags: [Allocations]
+      summary: Create allocation
+      operationId: createAllocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAllocationCommand'
+      responses:
+        '201':
+          description: Allocation created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /allocations/{id}/end:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags: [Allocations]
+      summary: End allocation
+      description: Set EndDate to today (soft delete)
+      operationId: endAllocation
+      responses:
+        '200':
+          description: Allocation ended
+
+  # ========================================
+  # TRANSACTIONS
+  # ========================================
+  /transactions:
+    get:
+      tags: [Transactions]
+      summary: List transactions
+      operationId: getTransactions
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: transactionType
+          in: query
+          schema:
+            type: string
+            enum: [Wallet, Account]
+        - name: assetId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: direction
+          in: query
+          schema:
+            type: string
+            enum: [IN, OUT, INTERNAL]
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: toDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: tokenSymbol
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [Pending, Confirmed, Failed]
+        - name: minAmount
+          in: query
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PagedResult'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TransactionDto'
+
+    post:
+      tags: [Transactions]
+      summary: Create manual transaction
+      operationId: createManualTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionCommand'
+      responses:
+        '201':
+          description: Transaction created
+
+  /transactions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Transactions]
+      summary: Get transaction by ID
+      operationId: getTransactionById
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDto'
+
+  /transactions/{id}/audit:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Transactions]
+      summary: Get transaction audit trail
+      operationId: getTransactionAudit
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEntryDto'
+
+  # ========================================
+  # PORTFOLIO
+  # ========================================
+  /portfolio/overview:
+    get:
+      tags: [Portfolio]
+      summary: Get portfolio overview
+      description: Total AUM, allocation breakdown, performance
+      operationId: getPortfolioOverview
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioOverviewDto'
+
+  /portfolio/consolidated:
+    get:
+      tags: [Portfolio]
+      summary: Get consolidated portfolio
+      description: All assets across all clients
+      operationId: getConsolidatedPortfolio
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsolidatedPortfolioDto'
+
+  /portfolio/recalculate:
+    post:
+      tags: [Portfolio]
+      summary: Recalculate portfolio
+      description: Trigger portfolio recalculation job
+      operationId: recalculatePortfolio
+      responses:
+        '202':
+          description: Recalculation initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+
+  # ========================================
+  # ANALYTICS
+  # ========================================
+  /analytics/performance:
+    get:
+      tags: [Analytics]
+      summary: Get performance metrics
+      operationId: getPerformance
+      parameters:
+        - name: clientId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: fromDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: granularity
+          in: query
+          schema:
+            type: string
+            enum: [daily, weekly, monthly]
+            default: daily
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceDto'
+
+  /analytics/allocation-drift:
+    get:
+      tags: [Analytics]
+      summary: Get allocation drift
+      description: Detect clients whose allocations have drifted from targets
+      operationId: getAllocationDrift
+      parameters:
+        - name: threshold
+          in: query
+          schema:
+            type: number
+            format: double
+            default: 5.0
+          description: Drift threshold percentage
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AllocationDriftDto'
+
+  # ========================================
+  # ALERTS
+  # ========================================
+  /alerts:
+    get:
+      tags: [Alerts]
+      summary: List alerts
+      operationId: getAlerts
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [Low, Medium, High, Critical]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [New, Acknowledged, Resolved]
+        - name: alertType
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PagedResult'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AlertDto'
+
+  /alerts/{id}/acknowledge:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags: [Alerts]
+      summary: Acknowledge alert
+      operationId: acknowledgeAlert
+      responses:
+        '200':
+          description: Alert acknowledged
+
+  /alerts/{id}/resolve:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags: [Alerts]
+      summary: Resolve alert
+      operationId: resolveAlert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resolution:
+                  type: string
+      responses:
+        '200':
+          description: Alert resolved
+
+  # ========================================
+  # EXPORT
+  # ========================================
+  /export/portfolio/pdf:
+    post:
+      tags: [Export]
+      summary: Export portfolio to PDF
+      operationId: exportPortfolioPdf
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientId:
+                  type: string
+                  format: uuid
+                includeTransactions:
+                  type: boolean
+                  default: false
+      responses:
+        '202':
+          description: Export job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJobDto'
+
+  /export/transactions/excel:
+    post:
+      tags: [Export]
+      summary: Export transactions to Excel
+      operationId: exportTransactionsExcel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fromDate:
+                  type: string
+                  format: date
+                toDate:
+                  type: string
+                  format: date
+                filters:
+                  type: object
+      responses:
+        '202':
+          description: Export job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJobDto'
+
+  /export/jobs/{jobId}:
+    parameters:
+      - name: jobId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Export]
+      summary: Get export job status
+      operationId: getExportJob
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJobDto'
+
+  /export/jobs/{jobId}/download:
+    parameters:
+      - name: jobId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Export]
+      summary: Download exported file
+      operationId: downloadExport
+      responses:
+        '200':
+          description: File download
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+
+# ========================================
+# COMPONENTS
+# ========================================
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ClientId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    WalletId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    PageNumber:
+      name: pageNumber
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    PageSize:
+      name: pageSize
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+
+  schemas:
+    # ========================================
+    # Common Schemas
+    # ========================================
+    PagedResult:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+        totalCount:
+          type: integer
+        totalPages:
+          type: integer
+        hasPreviousPage:
+          type: boolean
+        hasNextPage:
+          type: boolean
+        data:
+          type: array
+          items: {}
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+
+    # ========================================
+    # Client Schemas
+    # ========================================
+    ClientDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        document:
+          type: string
+          nullable: true
+        phoneNumber:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [Active, Inactive, Archived]
+        notes:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateClientCommand:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        email:
+          type: string
+          format: email
+          maxLength: 200
+        document:
+          type: string
+          maxLength: 50
+        phoneNumber:
+          type: string
+          maxLength: 20
+        notes:
+          type: string
+
+    UpdateClientCommand:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        email:
+          type: string
+          format: email
+          maxLength: 200
+        document:
+          type: string
+          maxLength: 50
+        phoneNumber:
+          type: string
+          maxLength: 20
+        status:
+          type: string
+          enum: [Active, Inactive]
+        notes:
+          type: string
+
+    # ========================================
+    # Wallet Schemas
+    # ========================================
+    WalletDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        walletAddress:
+          type: string
+        label:
+          type: string
+        blockchainProvider:
+          type: string
+        supportedChains:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [Active, Inactive]
+        totalBalanceUsd:
+          type: number
+          format: double
+        createdAt:
+          type: string
+          format: date-time
+
+    AddWalletCommand:
+      type: object
+      required:
+        - walletAddress
+      properties:
+        walletAddress:
+          type: string
+          pattern: '^0x[a-fA-F0-9]{40}$'
+        label:
+          type: string
+          maxLength: 100
+        supportedChains:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+
+    WalletBalanceDto:
+      type: object
+      properties:
+        tokenSymbol:
+          type: string
+        tokenName:
+          type: string
+        tokenAddress:
+          type: string
+        chain:
+          type: string
+        balance:
+          type: string
+          description: Balance in token units (as string for precision)
+        balanceUsd:
+          type: number
+          format: double
+        priceUsd:
+          type: number
+          format: double
+        lastSynced:
+          type: string
+          format: date-time
+
+    # ========================================
+    # Account Schemas
+    # ========================================
+    AccountDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        itemId:
+          type: string
+        accountNumber:
+          type: string
+        institutionName:
+          type: string
+        accountType:
+          type: string
+        status:
+          type: string
+          enum: [Active, Inactive, Error]
+        balance:
+          type: number
+          format: double
+        currency:
+          type: string
+        lastSynced:
+          type: string
+          format: date-time
+
+    # ========================================
+    # Allocation Schemas
+    # ========================================
+    AllocationDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+          format: uuid
+        clientName:
+          type: string
+        assetType:
+          type: string
+          enum: [Wallet, Account]
+        assetId:
+          type: string
+          format: uuid
+        assetLabel:
+          type: string
+        allocationType:
+          type: string
+          enum: [Percentage, FixedAmount]
+        allocationValue:
+          type: number
+          format: double
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+
+    CreateAllocationCommand:
+      type: object
+      required:
+        - clientId
+        - assetType
+        - assetId
+        - allocationType
+        - allocationValue
+        - startDate
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        assetType:
+          type: string
+          enum: [Wallet, Account]
+        assetId:
+          type: string
+          format: uuid
+        allocationType:
+          type: string
+          enum: [Percentage, FixedAmount]
+        allocationValue:
+          type: number
+          format: double
+          minimum: 0
+        startDate:
+          type: string
+          format: date
+        notes:
+          type: string
+
+    # ========================================
+    # Transaction Schemas
+    # ========================================
+    TransactionDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        transactionType:
+          type: string
+          enum: [Wallet, Account]
+        assetId:
+          type: string
+          format: uuid
+        transactionHash:
+          type: string
+        externalId:
+          type: string
+        chain:
+          type: string
+        direction:
+          type: string
+          enum: [IN, OUT, INTERNAL]
+        fromAddress:
+          type: string
+        toAddress:
+          type: string
+        tokenSymbol:
+          type: string
+        amount:
+          type: number
+          format: double
+        amountUsd:
+          type: number
+          format: double
+        fee:
+          type: number
+          format: double
+        feeUsd:
+          type: number
+          format: double
+        description:
+          type: string
+        category:
+          type: string
+        transactionDate:
+          type: string
+          format: date-time
+        isManualEntry:
+          type: boolean
+        status:
+          type: string
+          enum: [Pending, Confirmed, Failed]
+
+    CreateTransactionCommand:
+      type: object
+      required:
+        - transactionType
+        - assetId
+        - direction
+        - amount
+        - transactionDate
+      properties:
+        transactionType:
+          type: string
+          enum: [Wallet, Account]
+        assetId:
+          type: string
+          format: uuid
+        direction:
+          type: string
+          enum: [IN, OUT, INTERNAL]
+        tokenSymbol:
+          type: string
+        amount:
+          type: number
+          format: double
+        description:
+          type: string
+        category:
+          type: string
+        transactionDate:
+          type: string
+          format: date-time
+
+    AuditEntryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        transactionId:
+          type: string
+          format: uuid
+        action:
+          type: string
+          enum: [Created, Updated, Deleted]
+        changedBy:
+          type: string
+        changeDetails:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+
+    # ========================================
+    # Portfolio Schemas
+    # ========================================
+    ClientPortfolioDto:
+      type: object
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        clientName:
+          type: string
+        totalValue:
+          type: number
+          format: double
+        cryptoValue:
+          type: number
+          format: double
+        traditionalValue:
+          type: number
+          format: double
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationDto'
+        positions:
+          type: array
+          items:
+            type: object
+            properties:
+              symbol:
+                type: string
+              value:
+                type: number
+                format: double
+              allocation:
+                type: number
+                format: double
+        lastUpdated:
+          type: string
+          format: date-time
+
+    PortfolioOverviewDto:
+      type: object
+      properties:
+        totalAum:
+          type: number
+          format: double
+        totalClients:
+          type: integer
+        assetBreakdown:
+          type: object
+          properties:
+            crypto:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                percentage:
+                  type: number
+                  format: double
+            traditional:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                percentage:
+                  type: number
+                  format: double
+        topAssets:
+          type: array
+          items:
+            type: object
+            properties:
+              symbol:
+                type: string
+              value:
+                type: number
+                format: double
+              allocation:
+                type: number
+                format: double
+        performance:
+          type: object
+          properties:
+            daily:
+              type: number
+              format: double
+            weekly:
+              type: number
+              format: double
+            monthly:
+              type: number
+              format: double
+            ytd:
+              type: number
+              format: double
+        lastUpdated:
+          type: string
+          format: date-time
+
+    ConsolidatedPortfolioDto:
+      type: object
+      properties:
+        totalValue:
+          type: number
+          format: double
+        assetPositions:
+          type: array
+          items:
+            type: object
+        clientBreakdown:
+          type: array
+          items:
+            type: object
+
+    # ========================================
+    # Analytics Schemas
+    # ========================================
+    PerformanceDto:
+      type: object
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        period:
+          type: object
+          properties:
+            fromDate:
+              type: string
+              format: date
+            toDate:
+              type: string
+              format: date
+        roi:
+          type: number
+          format: double
+        profitLoss:
+          type: number
+          format: double
+        profitLossPercentage:
+          type: number
+          format: double
+        timeSeries:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              value:
+                type: number
+                format: double
+
+    AllocationDriftDto:
+      type: object
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        clientName:
+          type: string
+        targetAllocation:
+          type: number
+          format: double
+        currentAllocation:
+          type: number
+          format: double
+        driftPercentage:
+          type: number
+          format: double
+        assetInfo:
+          type: object
+
+    # ========================================
+    # Alert Schemas
+    # ========================================
+    AlertDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+          format: uuid
+        alertType:
+          type: string
+          enum: [AllocationDrift, LowBalance, LargeTransaction, SyncFailure, PriceAlert]
+        severity:
+          type: string
+          enum: [Low, Medium, High, Critical]
+        status:
+          type: string
+          enum: [New, Acknowledged, Resolved]
+        message:
+          type: string
+        metadata:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        acknowledgedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    # ========================================
+    # Export Schemas
+    # ========================================
+    ExportJobDto:
+      type: object
+      properties:
+        jobId:
+          type: string
+        status:
+          type: string
+          enum: [queued, processing, completed, failed]
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        downloadUrl:
+          type: string
+          format: uri
+          nullable: true
+        errorMessage:
+          type: string
+          nullable: true
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+security:
+  - BearerAuth: []
