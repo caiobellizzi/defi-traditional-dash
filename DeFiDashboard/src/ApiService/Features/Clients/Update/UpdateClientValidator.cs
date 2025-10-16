@@ -27,8 +27,8 @@ public class UpdateClientValidator : AbstractValidator<UpdateClientCommand>
             .When(x => !string.IsNullOrEmpty(x.PhoneNumber));
 
         RuleFor(x => x.Status)
-            .NotEmpty().WithMessage("Status is required")
-            .Must(s => s is "Active" or "Inactive" or "Suspended")
-            .WithMessage("Status must be Active, Inactive, or Suspended");
+            .Must(s => s is null or "Active" or "Inactive" or "Suspended")
+            .WithMessage("Status must be Active, Inactive, or Suspended")
+            .When(x => x.Status != null);
     }
 }

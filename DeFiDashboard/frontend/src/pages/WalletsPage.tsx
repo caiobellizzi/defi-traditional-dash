@@ -3,7 +3,7 @@ import { useWallets, useAddWallet, useDeleteWallet } from '../hooks/useWallets';
 import WalletForm from '../components/wallets/WalletForm';
 import Button from '../components/ui/Button';
 import Dialog from '../components/ui/Dialog';
-import Table from '../components/ui/Table';
+import Table, { type Column } from '../components/ui/Table';
 import { PageLayout } from '../components/layout/PageLayout';
 import { formatDate, truncateAddress } from '../lib/formatters';
 import type { WalletDto, AddWalletCommand } from '../types/api';
@@ -47,25 +47,25 @@ const WalletsPage = () => {
   };
 
   // Table columns
-  const columns = [
+  const columns: Column<WalletDto>[] = [
     {
       header: 'Label',
       accessor: 'label' as keyof WalletDto,
     },
     {
       header: 'Wallet Address',
-      accessor: ((row: WalletDto) => (
+      accessor: (row) => (
         <span
           className="font-mono text-sm cursor-help"
           title={row.walletAddress}
         >
           {truncateAddress(row.walletAddress, 10, 8)}
         </span>
-      )) as any,
+      ),
     },
     {
       header: 'Supported Chains',
-      accessor: ((row: WalletDto) => (
+      accessor: (row) => (
         <div className="flex flex-wrap gap-1">
           {row.supportedChains.map((chain) => (
             <span
@@ -76,11 +76,11 @@ const WalletsPage = () => {
             </span>
           ))}
         </div>
-      )) as any,
+      ),
     },
     {
       header: 'Status',
-      accessor: ((row: WalletDto) => (
+      accessor: (row) => (
         <span
           className={`px-2 py-1 text-xs font-semibold rounded-full ${
             row.status === 'Active'
@@ -90,19 +90,19 @@ const WalletsPage = () => {
         >
           {row.status}
         </span>
-      )) as any,
+      ),
     },
     {
       header: 'Created',
-      accessor: ((row: WalletDto) => (
+      accessor: (row) => (
         <span className="text-sm text-gray-600">
           {formatDate(row.createdAt)}
         </span>
-      )) as any,
+      ),
     },
     {
       header: 'Actions',
-      accessor: ((row: WalletDto) => (
+      accessor: (row) => (
         <div className="flex gap-2">
           <button
             onClick={(e) => {
@@ -114,7 +114,7 @@ const WalletsPage = () => {
             Delete
           </button>
         </div>
-      )) as any,
+      ),
     },
   ];
 

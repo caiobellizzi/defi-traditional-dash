@@ -18,7 +18,8 @@ namespace ApiService.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.9")
+                .HasDefaultSchema("dash")
+                .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -74,7 +75,7 @@ namespace ApiService.Migrations
                         .IsUnique()
                         .HasDatabaseName("account_balances_account_id_balance_type_key");
 
-                    b.ToTable("account_balances", (string)null);
+                    b.ToTable("account_balances", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.Client", b =>
@@ -155,7 +156,7 @@ namespace ApiService.Migrations
                     b.HasIndex("Status")
                         .HasDatabaseName("idx_clients_status");
 
-                    b.ToTable("clients", (string)null);
+                    b.ToTable("clients", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.ClientAssetAllocation", b =>
@@ -231,7 +232,7 @@ namespace ApiService.Migrations
                         .IsUnique()
                         .HasDatabaseName("client_asset_allocations_client_id_asset_type_asset_id_end_d_key");
 
-                    b.ToTable("client_asset_allocations", (string)null);
+                    b.ToTable("client_asset_allocations", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.CustodyWallet", b =>
@@ -301,7 +302,7 @@ namespace ApiService.Migrations
                         .IsUnique()
                         .HasDatabaseName("idx_wallets_address");
 
-                    b.ToTable("custody_wallets", (string)null);
+                    b.ToTable("custody_wallets", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.PerformanceMetric", b =>
@@ -341,7 +342,7 @@ namespace ApiService.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.ToTable("PerformanceMetrics");
+                    b.ToTable("PerformanceMetrics", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.PriceHistory", b =>
@@ -368,7 +369,7 @@ namespace ApiService.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PriceHistories");
+                    b.ToTable("PriceHistories", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.RebalancingAlert", b =>
@@ -418,7 +419,7 @@ namespace ApiService.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.ToTable("RebalancingAlerts");
+                    b.ToTable("RebalancingAlerts", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.SystemConfiguration", b =>
@@ -445,7 +446,7 @@ namespace ApiService.Migrations
 
                     b.HasKey("Key");
 
-                    b.ToTable("system_configuration", (string)null);
+                    b.ToTable("system_configuration", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.TraditionalAccount", b =>
@@ -539,7 +540,7 @@ namespace ApiService.Migrations
                     b.HasIndex("Status")
                         .HasDatabaseName("idx_accounts_status");
 
-                    b.ToTable("traditional_accounts", (string)null);
+                    b.ToTable("traditional_accounts", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.Transaction", b =>
@@ -672,7 +673,7 @@ namespace ApiService.Migrations
                     b.HasIndex("TransactionType", "AssetId", "TransactionDate")
                         .HasDatabaseName("idx_transactions_asset");
 
-                    b.ToTable("transactions", (string)null);
+                    b.ToTable("transactions", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.TransactionAudit", b =>
@@ -707,7 +708,7 @@ namespace ApiService.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("TransactionAudits");
+                    b.ToTable("TransactionAudits", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.WalletBalance", b =>
@@ -784,7 +785,7 @@ namespace ApiService.Migrations
                         .IsUnique()
                         .HasDatabaseName("wallet_balances_wallet_id_chain_coalesce_key");
 
-                    b.ToTable("wallet_balances", (string)null);
+                    b.ToTable("wallet_balances", "dash");
                 });
 
             modelBuilder.Entity("ApiService.Common.Database.Entities.AccountBalance", b =>

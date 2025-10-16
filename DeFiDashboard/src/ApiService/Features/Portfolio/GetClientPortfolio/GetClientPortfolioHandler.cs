@@ -23,6 +23,7 @@ public class GetClientPortfolioHandler : IRequestHandler<GetClientPortfolioQuery
         try
         {
             var client = await _context.Clients
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == request.ClientId, cancellationToken);
 
             if (client == null)
@@ -32,6 +33,7 @@ public class GetClientPortfolioHandler : IRequestHandler<GetClientPortfolioQuery
 
             // Get active allocations
             var allocations = await _context.ClientAssetAllocations
+                .AsNoTracking()
                 .Where(a => a.ClientId == request.ClientId && a.EndDate == null)
                 .ToListAsync(cancellationToken);
 
@@ -44,11 +46,13 @@ public class GetClientPortfolioHandler : IRequestHandler<GetClientPortfolioQuery
                 if (allocation.AssetType == "Wallet")
                 {
                     var wallet = await _context.CustodyWallets
+                        .AsNoTracking()
                         .FirstOrDefaultAsync(w => w.Id == allocation.AssetId, cancellationToken);
 
                     if (wallet != null)
                     {
                         var balances = await _context.WalletBalances
+                            .AsNoTracking()
                             .Where(b => b.WalletId == wallet.Id)
                             .ToListAsync(cancellationToken);
 
@@ -79,11 +83,13 @@ public class GetClientPortfolioHandler : IRequestHandler<GetClientPortfolioQuery
                 else if (allocation.AssetType == "Account")
                 {
                     var account = await _context.TraditionalAccounts
+                        .AsNoTracking()
                         .FirstOrDefaultAsync(a => a.Id == allocation.AssetId, cancellationToken);
 
                     if (account != null)
                     {
                         var balances = await _context.AccountBalances
+                            .AsNoTracking()
                             .Where(b => b.AccountId == account.Id)
                             .ToListAsync(cancellationToken);
 

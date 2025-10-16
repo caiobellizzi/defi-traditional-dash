@@ -24,6 +24,7 @@ public class GetClientByIdHandler : IRequestHandler<GetClientByIdQuery, Result<C
         try
         {
             var client = await _context.Clients
+                .AsNoTracking()
                 .Where(c => c.Id == request.Id)
                 .Select(c => new ClientDto
                 {

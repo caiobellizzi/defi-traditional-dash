@@ -1,5 +1,6 @@
 using ApiService.Common.Database;
 using ApiService.Common.Database.Entities;
+using ApiService.Common.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,7 +49,7 @@ public class CreateClientHandler : IRequestHandler<CreateClientCommand, Result<G
                 Email = request.Email,
                 Document = request.Document,
                 PhoneNumber = request.PhoneNumber,
-                Notes = request.Notes,
+                Notes = InputSanitizer.Sanitize(request.Notes),
                 Status = "Active",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow

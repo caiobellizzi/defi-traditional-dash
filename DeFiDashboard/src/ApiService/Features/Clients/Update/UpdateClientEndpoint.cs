@@ -1,3 +1,4 @@
+using System;
 using Carter;
 using MediatR;
 
@@ -25,15 +26,25 @@ public class UpdateClientEndpoint : ICarterModule
 
             var result = await sender.Send(command, ct);
 
-            return result.IsSuccess
-                ? Results.NoContent()
-                : Results.BadRequest(new { error = result.Error });
+            if (result.IsSuccess)
+            {
+                return Results.NoContent();
+            }
+
+            if (!string.IsNullOrEmpty(result.Error) &&
+                result.Error.Contains("not found", StringComparison.OrdinalIgnoreCase))
+            {
+                return Results.NotFound(new { error = result.Error });
+            }
+
+            return Results.BadRequest(new { error = result.Error });
         })
         .WithName("UpdateClient")
         .WithTags("Clients")
         .WithOpenApi()
         .Produces(StatusCodes.Status204NoContent)
-        .Produces<object>(StatusCodes.Status400BadRequest);
+        .Produces<object>(StatusCodes.Status400BadRequest)
+        .Produces<object>(StatusCodes.Status404NotFound);
     }
 }
 

@@ -12,12 +12,12 @@ var apiService = builder.AddProject<Projects.ApiService>("apiservice")
     .WaitFor(database); // Wait for database to be healthy
 
 // Add Frontend with hot-reload (waits for API to be ready)
-builder.AddNpmApp("frontend", "../frontend", "dev")
-    .WithHttpEndpoint(port: 5173, env: "PORT")
-    .WithEnvironment("VITE_API_BASE_URL", apiService.GetEndpoint("https")) // Use HTTPS
-    .WithReference(apiService) // Explicit reference
-    .WaitFor(apiService) // Wait for API to be healthy
-    .WithExternalHttpEndpoints()
-    .PublishAsDockerFile();
+// NOTE: Frontend runs separately via `npm run dev` in frontend directory
+// Aspire npm hosting has port detection issues with Vite
+// builder.AddNpmApp("frontend", "../frontend", "dev")
+//     .WithHttpEndpoint(port: 5173)
+//     .WithEnvironment("VITE_API_BASE_URL", apiService.GetEndpoint("https"))
+//     .WithReference(apiService)
+//     .WithExternalHttpEndpoints();
 
 builder.Build().Run();

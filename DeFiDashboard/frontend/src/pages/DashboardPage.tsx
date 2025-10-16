@@ -9,6 +9,7 @@ import { QuickActionCard } from '../components/dashboard/QuickActionCard';
 import { PageLayout } from '../components/layout/PageLayout';
 import { formatDate, formatCurrency } from '../lib/formatters';
 import type { ClientPortfolioDto } from '../types/portfolio';
+import type { WalletDto } from '../types/api';
 import {
   PieChart,
   Pie,
@@ -20,6 +21,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  type PieLabelRenderProps,
 } from 'recharts';
 
 /**
@@ -132,7 +134,7 @@ export default function DashboardPage() {
     return clientsData.items.slice(0, 5);
   }, [clientsData]);
 
-  const recentWallets = useMemo(() => {
+  const recentWallets = useMemo<WalletDto[]>(() => {
     if (!walletsData) return [];
     return walletsData.slice(0, 5);
   }, [walletsData]);
@@ -282,7 +284,7 @@ export default function DashboardPage() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={(props: any) =>
+                    label={(props: PieLabelRenderProps) =>
                       `${props.name}: ${(props.percent * 100).toFixed(0)}%`
                     }
                     outerRadius={100}
@@ -394,7 +396,7 @@ export default function DashboardPage() {
                 </div>
               ) : recentWallets.length > 0 ? (
                 <div className="space-y-3">
-                  {recentWallets.map((wallet: any) => (
+                  {recentWallets.map((wallet) => (
                     <div key={wallet.id} className="flex items-center justify-between group/item">
                       <div className="min-w-0 flex-1">
                         <Link

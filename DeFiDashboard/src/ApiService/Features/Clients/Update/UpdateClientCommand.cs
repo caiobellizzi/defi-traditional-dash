@@ -10,5 +10,5 @@ public record UpdateClientCommand(
     string? Document,
     string? PhoneNumber,
     string? Notes,
-    string Status
+    string? Status = null
 ) : IRequest<Result<bool>>;

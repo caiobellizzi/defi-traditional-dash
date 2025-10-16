@@ -1,5 +1,6 @@
 using ApiService.Common.Database;
 using ApiService.Common.Database.Entities;
+using ApiService.Common.Utilities;
 using ApiService.Features.Clients.Create;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -34,11 +35,11 @@ public class AddWalletHandler : IRequestHandler<AddWalletCommand, Result<Guid>>
             {
                 Id = Guid.NewGuid(),
                 WalletAddress = request.WalletAddress,
-                Label = request.Label,
+                Label = InputSanitizer.Sanitize(request.Label),
                 BlockchainProvider = "Moralis",
                 SupportedChains = request.SupportedChains,
                 Status = "Active",
-                Notes = request.Notes,
+                Notes = InputSanitizer.Sanitize(request.Notes),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
