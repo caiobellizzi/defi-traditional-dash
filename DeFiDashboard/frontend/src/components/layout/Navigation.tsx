@@ -12,9 +12,11 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { path: '/dashboard', label: 'Dashboard' },
+  { path: '/portfolio', label: 'Portfolio' },
   { path: '/clients', label: 'Clients' },
   { path: '/wallets', label: 'Wallets' },
   { path: '/allocations', label: 'Allocations' },
+  { path: '/transactions', label: 'Transactions' },
 ];
 
 export function Navigation() {

@@ -4,8 +4,11 @@ import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './contexts/ThemeContext';
 import DashboardPage from './pages/DashboardPage';
 import ClientsPage from './pages/ClientsPage';
+import ClientDetailPage from './pages/ClientDetailPage';
 import WalletsPage from './pages/WalletsPage';
 import AllocationsPage from './pages/AllocationsPage';
+import PortfolioPage from './pages/PortfolioPage';
+import TransactionsPage from './pages/TransactionsPage';
 
 /**
  * Configure React Query client
@@ -35,14 +38,21 @@ function App() {
             {/* Dashboard */}
             <Route path="/dashboard" element={<DashboardPage />} />
 
+            {/* Portfolio routes */}
+            <Route path="/portfolio" element={<PortfolioPage />} />
+
             {/* Clients routes */}
             <Route path="/clients" element={<ClientsPage />} />
+            <Route path="/clients/:clientId" element={<ClientDetailPage />} />
 
             {/* Wallets routes */}
             <Route path="/wallets" element={<WalletsPage />} />
 
             {/* Allocations routes */}
             <Route path="/allocations" element={<AllocationsPage />} />
+
+            {/* Transactions routes */}
+            <Route path="/transactions" element={<TransactionsPage />} />
 
             {/* 404 fallback */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -9,7 +9,7 @@ import {
 import ClientForm from '../components/clients/ClientForm';
 import Button from '../components/ui/Button';
 import Dialog from '../components/ui/Dialog';
-import Table from '../components/ui/Table';
+import Table, { type Column } from '../components/ui/Table';
 import { PageLayout } from '../components/layout/PageLayout';
 import type { ClientDto, CreateClientCommand } from '../types/api';
 
@@ -75,7 +75,7 @@ const ClientsPage = () => {
   };
 
   // Table columns
-  const columns = [
+  const columns: Column<ClientDto>[] = [
     {
       header: 'Name',
       accessor: 'name' as keyof ClientDto,
@@ -94,7 +94,7 @@ const ClientsPage = () => {
     },
     {
       header: 'Status',
-      accessor: ((row: ClientDto) => (
+      accessor: (row) => (
         <span
           className={`px-2 py-1 text-xs font-semibold rounded-full ${
             row.status === 'Active'
@@ -104,11 +104,11 @@ const ClientsPage = () => {
         >
           {row.status}
         </span>
-      )) as any,
+      ),
     },
     {
       header: 'Actions',
-      accessor: ((row: ClientDto) => (
+      accessor: (row) => (
         <div className="flex gap-2">
           <button
             onClick={(e) => {
@@ -129,7 +129,7 @@ const ClientsPage = () => {
             Delete
           </button>
         </div>
-      )) as any,
+      ),
     },
   ];
 
