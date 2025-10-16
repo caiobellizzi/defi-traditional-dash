@@ -22,7 +22,7 @@ public class GetClientsHandler : IRequestHandler<GetClientsQuery, Result<PagedRe
     {
         try
         {
-            var query = _context.Clients.AsQueryable();
+            var query = _context.Clients.AsNoTracking();
 
             // Filter by status if provided
             if (!string.IsNullOrEmpty(request.Status))

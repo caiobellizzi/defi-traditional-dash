@@ -21,6 +21,7 @@ public class GetClientAllocationsHandler : IRequestHandler<GetClientAllocationsQ
         try
         {
             var query = _context.ClientAssetAllocations
+                .AsNoTracking()
                 .Where(a => a.ClientId == request.ClientId);
 
             if (request.ActiveOnly)

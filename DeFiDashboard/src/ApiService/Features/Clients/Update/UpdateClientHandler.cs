@@ -1,4 +1,5 @@
 using ApiService.Common.Database;
+using ApiService.Common.Utilities;
 using ApiService.Features.Clients.Create;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -59,8 +60,11 @@ public class UpdateClientHandler : IRequestHandler<UpdateClientCommand, Result<b
             client.Email = request.Email;
             client.Document = request.Document;
             client.PhoneNumber = request.PhoneNumber;
-            client.Notes = request.Notes;
-            client.Status = request.Status;
+            client.Notes = InputSanitizer.Sanitize(request.Notes);
+            if (request.Status != null)
+            {
+                client.Status = request.Status;
+            }
             client.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync(cancellationToken);

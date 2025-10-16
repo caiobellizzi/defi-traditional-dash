@@ -21,7 +21,7 @@ public class GetWalletsHandler : IRequestHandler<GetWalletsQuery, Result<PagedRe
     {
         try
         {
-            var query = _context.CustodyWallets.AsQueryable();
+            var query = _context.CustodyWallets.AsNoTracking();
 
             if (!string.IsNullOrEmpty(request.Status))
             {
@@ -60,6 +60,7 @@ public class GetWalletsHandler : IRequestHandler<GetWalletsQuery, Result<PagedRe
         }
         catch (Exception ex)
         {
+            // Note: ex is available but not logged - consider adding ILogger
             return Result<PagedResult<WalletDto>>.Failure("An error occurred while retrieving wallets");
         }
     }
