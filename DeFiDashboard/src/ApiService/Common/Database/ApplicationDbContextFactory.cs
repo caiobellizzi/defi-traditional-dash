@@ -11,7 +11,8 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
 
         // Use a placeholder connection string for migrations
         // The actual connection string will be provided at runtime
-        optionsBuilder.UseNpgsql("Host=localhost;Database=defi_dashboard;Username=postgres;Password=postgres");
+        optionsBuilder.UseNpgsql("Host=localhost;Database=defi_dashboard;Username=postgres;Password=postgres",
+            npgsqlOptions => npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", "dash"));
 
         return new ApplicationDbContext(optionsBuilder.Options);
     }

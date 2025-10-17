@@ -2,13 +2,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './contexts/ThemeContext';
-import DashboardPage from './pages/DashboardPage';
-import ClientsPage from './pages/ClientsPage';
-import ClientDetailPage from './pages/ClientDetailPage';
-import WalletsPage from './pages/WalletsPage';
-import AllocationsPage from './pages/AllocationsPage';
-import PortfolioPage from './pages/PortfolioPage';
-import TransactionsPage from './pages/TransactionsPage';
+import { DashboardPage } from '@/features/dashboard';
+import { ClientsPage, ClientDetailPage } from '@/features/clients';
+import { WalletsPage } from '@/features/wallets';
+import { AccountsPage } from '@/features/accounts';
+import { AllocationsPage } from '@/features/allocations';
+import { PortfolioPage } from '@/features/portfolio';
+import { TransactionsPage } from '@/features/transactions';
+import { AnalyticsPage } from '@/features/analytics';
+import { AlertsPage } from '@/features/alerts';
 
 /**
  * Configure React Query client
@@ -48,11 +50,20 @@ function App() {
             {/* Wallets routes */}
             <Route path="/wallets" element={<WalletsPage />} />
 
+            {/* Accounts routes */}
+            <Route path="/accounts" element={<AccountsPage />} />
+
             {/* Allocations routes */}
             <Route path="/allocations" element={<AllocationsPage />} />
 
             {/* Transactions routes */}
             <Route path="/transactions" element={<TransactionsPage />} />
+
+            {/* Analytics routes */}
+            <Route path="/analytics" element={<AnalyticsPage />} />
+
+            {/* Alerts routes */}
+            <Route path="/alerts" element={<AlertsPage />} />
 
             {/* 404 fallback */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

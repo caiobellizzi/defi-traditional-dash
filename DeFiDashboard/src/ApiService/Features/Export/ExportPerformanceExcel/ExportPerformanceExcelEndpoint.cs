@@ -1,6 +1,5 @@
 using Carter;
 using MediatR;
-using ApiService.Features.Export.ExportPortfolioPdf;
 
 namespace ApiService.Features.Export.ExportPerformanceExcel;
 

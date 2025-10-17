@@ -19,3 +19,6 @@ export { DataTable } from './DataTable';
 export { StatCard } from './StatCard';
 export { QuickActionCard } from './QuickActionCard';
 export { ConnectionStatus } from './ConnectionStatus';
+
+// Charts
+export * from './charts';

@@ -10,8 +10,8 @@ import { PageLayout } from '@/shared/components/layout/PageLayout';
 import { formatDate, formatCurrency } from '@/shared/lib/utils';
 import type { ClientPortfolioDto } from '@/shared/types/portfolio.types';
 import type { WalletDto } from '@/shared/types/api.types';
-import { usePortfolioRealtime } from '@/hooks/usePortfolioRealtime';
-import { useAlertsRealtime } from '@/hooks/useAlertsRealtime';
+import { usePortfolioRealtime } from '@/shared/hooks/usePortfolioRealtime';
+import { useAlertsRealtime } from '@/shared/hooks/useAlertsRealtime';
 import {
   PieChart,
   Pie,
@@ -290,9 +290,10 @@ export default function DashboardPage() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={(props: PieLabelRenderProps) =>
-                      `${props.name}: ${(props.percent * 100).toFixed(0)}%`
-                    }
+                    label={(props: PieLabelRenderProps) => {
+                      const percent = props.percent as number;
+                      return `${props.name}: ${(percent * 100).toFixed(0)}%`;
+                    }}
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"

@@ -15,8 +15,11 @@ const navItems: NavItem[] = [
   { path: '/portfolio', label: 'Portfolio' },
   { path: '/clients', label: 'Clients' },
   { path: '/wallets', label: 'Wallets' },
+  { path: '/accounts', label: 'Accounts' },
   { path: '/allocations', label: 'Allocations' },
   { path: '/transactions', label: 'Transactions' },
+  { path: '/analytics', label: 'Analytics' },
+  { path: '/alerts', label: 'Alerts' },
 ];
 
 export function Navigation() {

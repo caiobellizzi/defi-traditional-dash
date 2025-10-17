@@ -6,7 +6,7 @@ import { PageLayout } from '@/shared/components/layout/PageLayout';
 import { clientsApi } from '@/features/clients/api/clients.api';
 import { portfolioApi } from '@/features/portfolio/api/portfolio.api';
 import { formatCurrency, formatDate } from '@/shared/lib/utils';
-import { useClientRealtime } from '@/hooks/useClientRealtime';
+import { useClientRealtime } from '@/shared/hooks/useClientRealtime';
 
 /**
  * Client Detail Page - Shows individual client information and portfolio breakdown

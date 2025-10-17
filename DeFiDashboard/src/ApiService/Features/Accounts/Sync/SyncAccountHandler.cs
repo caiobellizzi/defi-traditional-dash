@@ -1,5 +1,6 @@
 using ApiService.Common.Database;
 using Entities = ApiService.Common.Database.Entities;
+using ApiService.Common.DTOs;
 using ApiService.Common.Providers;
 using ApiService.Features.Clients.Create;
 using Hangfire;

@@ -1,15 +1,11 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// Add PostgreSQL with health check
-var postgres = builder.AddPostgres("postgres")
-    .WithEnvironment("POSTGRES_DB", "defi_dashboard");
+// Use direct Supabase PostgreSQL connection (no container)
+var database = builder.AddConnectionString("defi-db");
 
-var database = postgres.AddDatabase("defi-db");
-
-// Add API Service (waits for PostgreSQL to be ready)
+// Add API Service
 var apiService = builder.AddProject<Projects.ApiService>("apiservice")
-    .WithReference(database)
-    .WaitFor(database); // Wait for database to be healthy
+    .WithReference(database);
 
 // Add Frontend with hot-reload (waits for API to be ready)
 // NOTE: Frontend runs separately via `npm run dev` in frontend directory

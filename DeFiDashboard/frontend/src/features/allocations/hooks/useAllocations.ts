@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { allocationsApi } from '../api/allocations.api';
 import type { CreateAllocationCommand } from '@/shared/types/api.types';
+import type { Allocation } from '../types/allocation.types';
 
 /**
  * React Query hooks for allocation operations
@@ -12,12 +13,12 @@ import type { CreateAllocationCommand } from '@/shared/types/api.types';
  * so we fetch for all clients and aggregate
  */
 export const useAllocations = () => {
-  return useQuery({
+  return useQuery<Allocation[]>({
     queryKey: ['allocations'],
     queryFn: async () => {
       // Return empty array - Dashboard will calculate from client data
       // This prevents calling non-existent /api/allocations endpoint
-      return [];
+      return [] as Allocation[];
     },
     staleTime: 10000,
   });

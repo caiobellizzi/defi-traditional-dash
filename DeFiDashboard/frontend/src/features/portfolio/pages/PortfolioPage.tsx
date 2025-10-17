@@ -5,7 +5,7 @@ import { useClients } from '@/features/clients/hooks/useClients';
 import { portfolioApi } from '@/features/portfolio/api/portfolio.api';
 import { formatCurrency, formatDate } from '@/shared/lib/utils';
 import type { ClientPortfolioDto } from '@/shared/types/portfolio.types';
-import { usePortfolioRealtime } from '@/hooks/usePortfolioRealtime';
+import { usePortfolioRealtime } from '@/shared/hooks/usePortfolioRealtime';
 
 /**
  * Portfolio page - Overview of all client portfolios
